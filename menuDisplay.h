@@ -1,0 +1,413 @@
+
+#define NameNumMax 16
+
+void gotoxy(short x, short y) {
+    COORD coord = {x, y};
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+extern void MessageBar(char message[40]){
+
+	gotoxy(0, 8);
+	printf("——————");
+	printf("\n");
+
+	printf("消息栏：\n\n%s", message);
+
+
+}
+
+extern void MainMenu_Display(int SelectedOption){
+	
+
+	printf("【主菜单】");
+	printf("\n");
+
+	if( SelectedOption == 1){
+		printf("|登入<");
+	}
+	else{
+		printf("登入");
+	}
+	printf("\n");
+
+	if( SelectedOption == 2){
+		printf("|注册<");
+	}
+	else{
+		printf("注册");
+	}
+	printf("\n");
+
+	if( SelectedOption == 3){
+		printf("|退出<");
+	}
+	else{
+		printf("退出");
+	}
+	printf("\n");
+
+}
+
+extern void LoginUI_Display(int SelectedOption, int dataInputState, int StrNum_Name, char temp_accountName[20]){
+	int x = StrNum_Name + 8;
+	int i;
+	
+	printf("【登入界面】");
+	printf("\n");
+	
+
+	if( SelectedOption == 1){
+		printf("> 账户：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+		printf("\n");
+	}
+	else{
+		printf("账户：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+		printf("\n");
+	}
+
+	if( SelectedOption == 2){
+		printf("|登入<");
+	}
+	else{
+		printf("登入");
+	}
+	printf("\n");
+
+	if( SelectedOption == 3){
+		printf("|返回<");
+	}
+	else{
+		printf("返回");
+	}
+	printf("\n");
+
+	if( SelectedOption == 1){
+		gotoxy( 0, 1);
+		printf("> 账户：");
+		gotoxy( 8, 1);
+		printf("%s",temp_accountName);
+		if( dataInputState == 0){
+			gotoxy( (short)x, 1);
+			printf("<");
+		}
+		printf("\n");
+	}
+	else if( SelectedOption != 1){
+		gotoxy( 0, 1);
+		printf("账户：");
+		gotoxy( 6, 1);
+		printf("%s",temp_accountName);
+		printf("\n");
+	}
+}
+
+extern void RegisterUI_Display(int SelectedOption){
+	
+	int i;
+	printf("【注册界面】");
+	printf("\n");
+
+	if( SelectedOption == 1){
+		printf("> 输入新建账户名称：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+		printf("\n");
+	}
+	else{
+		printf("输入新建账户名称：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+		printf("\n");
+	}
+
+	if( SelectedOption == 2){
+		printf("|完成<");
+	}
+	else{
+		printf("完成");
+	}
+	printf("\n");
+
+	if( SelectedOption == 3){
+		printf("|返回<");
+	}
+	else{
+		printf("返回");
+	}
+	printf("\n");
+
+}
+
+extern void AccountUI_Display(int SelectedOption, char *AccountName){
+	
+
+	printf("【账户界面】");
+	printf("\n");
+
+	printf("您好！%s！",AccountName);
+	printf("\n");
+
+	if( SelectedOption == 1){
+		printf("|查看班级<");
+	}
+	else{
+		printf("查看班级");
+	}
+	printf("\n");
+
+	if( SelectedOption == 2){
+		printf("|新建班级<");
+	}
+	else{
+		printf("新建班级");
+	}
+	printf("\n");
+
+	if( SelectedOption == 3){
+		printf("|注销<");
+	}
+	else{
+		printf("注销");
+	}
+	printf("\n");
+
+}
+
+extern void NewClass_Display(int SelectedOption){
+	
+	int i;
+	printf("【新建班级】");
+	printf("\n");
+
+	if( SelectedOption == 1){
+		printf("> 输入新建班级名称：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+		printf("\n");
+	}
+	else{
+		printf("输入新建班级名称：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+		printf("\n");
+	}
+
+	if( SelectedOption == 2){
+		printf("|完成<");
+	}
+	else{
+		printf("完成");
+	}
+	printf("\n");
+
+	if( SelectedOption == 3){
+		printf("|返回<");
+	}
+	else{
+		printf("返回");
+	}
+	printf("\n");
+
+}
+
+extern void ViewClassList_Display(int SelectedOption, int ClassCount){
+
+	SelectedOption = SelectedOption + ClassCount;
+
+
+	printf("【查看班级】");
+	printf("\n");
+
+	printf("————————————");
+	printf("\n");
+
+	printf("班级列表");
+	printf("\n");
+
+//	PrintList_Class(SelectedOption);							//==================未编写函数
+	printf("\n");
+
+	printf("————————————");
+	printf("\n");
+
+	if( SelectedOption == ClassCount + 1){
+		printf("|返回<");
+	}
+	else{
+		printf("返回");
+	}
+	printf("\n");
+}
+
+extern void ViewClassA_Display(int SelectedOption, int StudentCount){
+
+	SelectedOption = SelectedOption + StudentCount;
+
+
+	printf("【班级：xxx】");
+	printf("\n");
+
+	printf("————————————");
+	printf("\n");
+
+	printf("学生列表");
+	printf("\n");
+
+//	PrintList_Student(SelectedOption);							//==================未编写函数
+	printf("\n");
+
+	printf("————————————");
+	printf("\n");
+
+	if( SelectedOption == StudentCount + 1){
+		printf("|编辑<");
+	}
+	else{
+		printf("编辑");
+	}
+	printf("\n");
+	
+	if( SelectedOption == StudentCount + 2){
+		printf("|返回<");
+	}
+	else{
+		printf("返回");
+	}
+	printf("\n");
+}
+
+extern void ViewClassB_Display(int SelectedOption, int StudentCount){
+	
+	SelectedOption = SelectedOption + StudentCount;
+
+
+	printf("【班级：xxx】");
+	printf("\n");
+
+	printf("————————————");
+	printf("\n");
+
+	printf("学生列表");
+	printf("\n");
+
+	printf("————————————");
+	printf("\n");
+
+	if( SelectedOption == StudentCount + 1){
+		printf("|添加同学<");
+	}
+	else{
+		printf("添加同学");
+	}
+	printf("\n");
+	
+	if( SelectedOption == StudentCount + 2){
+		printf("|返回<");
+	}
+	else{
+		printf("返回");
+	}
+	printf("\n");
+}
+
+extern void ViewClassC_Display(int SelectedOption, int StudentCount){
+	
+	int i;
+	SelectedOption = SelectedOption + StudentCount;
+
+
+	printf("【班级：xxx】");
+	printf("\n");
+
+	printf("————————————");
+	printf("\n");
+
+	printf("学生列表");
+	printf("\n");
+
+	printf("————————————");
+	printf("\n");
+
+	if( SelectedOption == StudentCount + 1){
+		printf("> 姓名：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+	}
+	else{
+		printf("姓名：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+	}
+	printf("\n");
+	
+	if( SelectedOption == StudentCount + 2){
+		printf("> 学号：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+	}
+	else{
+		printf("学号：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+	}
+	printf("\n");	
+
+	if( SelectedOption == StudentCount + 3){
+		printf("> 性别：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+	}
+	else{
+		printf("性别：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+	}
+	printf("\n");
+	
+	if( SelectedOption == StudentCount + 4){
+		printf("> 住址：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+	}
+	else{
+		printf("住址：");
+		for(i = 0; i < NameNumMax; i++){
+			printf("_");
+		}
+	}
+	printf("\n");
+	
+	if( SelectedOption == StudentCount + 5){
+		printf("|完成<");
+	}
+	else{
+		printf("完成");
+	}
+	printf("\n");
+	
+	if( SelectedOption == StudentCount + 6){
+		printf("|取消<");
+	}
+	else{
+		printf("取消");
+	}
+	printf("\n");
+}
