@@ -1,5 +1,5 @@
 
-#define NameNumMax 16
+
 
 void gotoxy(short x, short y) {
     COORD coord = {x, y};
@@ -49,8 +49,8 @@ extern void MainMenu_Display(int SelectedOption){
 
 }
 
-extern void LoginUI_Display(int SelectedOption, int dataInputState, int StrNum_Name, char temp_accountName[20]){
-	int x = StrNum_Name + 8;
+extern void LoginUI_Display(int SelectedOption, int dataInputState, int StrNum){
+	int x = StrNum + 8;
 	int i;
 	
 	printf("【登入界面】");
@@ -108,8 +108,8 @@ extern void LoginUI_Display(int SelectedOption, int dataInputState, int StrNum_N
 	}
 }
 
-extern void RegisterUI_Display(int SelectedOption){
-	
+extern void RegisterUI_Display(int SelectedOption, int dataInputState, int StrNum){
+	int x = StrNum + 20;
 	int i;
 	printf("【注册界面】");
 	printf("\n");
@@ -144,6 +144,25 @@ extern void RegisterUI_Display(int SelectedOption){
 		printf("返回");
 	}
 	printf("\n");
+
+	if( SelectedOption == 1){
+		gotoxy( 0, 1);
+		printf("> 输入新建账户名称：");
+		gotoxy( 20, 1);
+		printf("%s", reg_accountName);
+		if( dataInputState == 0){
+			gotoxy( (short)x, 1);
+			printf("<");
+		}
+		printf("\n");
+	}
+	else if( SelectedOption != 1){
+		gotoxy( 0, 1);
+		printf("输入新建账户名称：");
+		gotoxy( 18, 1);
+		printf("%s", reg_accountName);
+		printf("\n");
+	}
 
 }
 
