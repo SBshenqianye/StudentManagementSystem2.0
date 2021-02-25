@@ -1,5 +1,7 @@
 
 
+extern void PrintList_Class(SelectedOption, ClassCount);
+
 
 void gotoxy(short x, short y) {
     COORD coord = {x, y};
@@ -240,22 +242,16 @@ extern void NewClass_Display(int SelectedOption){
 
 }
 
-extern void ViewClassList_Display(int SelectedOption, int ClassCount){
+extern void ViewClassList_Display(int SelectedOption, int ClassCount, struct CLASS *classLineHead){
 
-	SelectedOption = SelectedOption + ClassCount;
 
 
 	printf("【查看班级】");
 	printf("\n");
 
 	printf("————————————");
-	printf("\n");
 
-	printf("班级列表");
-	printf("\n");
-
-//	PrintList_Class(SelectedOption);							//==================未编写函数
-	printf("\n");
+	PrintList_Class(SelectedOption, ClassCount, classLineHead);	
 
 	printf("————————————");
 	printf("\n");

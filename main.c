@@ -2,9 +2,9 @@
 #include "globalsDefine.h"
 
 //==========
-char temp_accountName[NameNumMax];		//登入界面 账户ID显示
+char temp_accountName[NameNumMax] = "author";		//登入界面 账户ID显示
 char reg_accountName[NameNumMax];		//注册界面 账户ID显示
-char accountName[NameNumMax];			//登入成功后的ID显示
+char accountName[NameNumMax] = "author";			//登入成功后的ID显示
 int StrNum_Name = 0;					//
 int StrNum_NewName = 0;					//
 
@@ -20,10 +20,11 @@ int StrNum_NewName = 0;					//
 
 
 //==========
-static void LogToAcc();
-static void ReToLog();
-static void MainMenu();
-static void AccountUI();
+void LogToAcc();
+void ReToLog();
+void MainMenu();
+void AccountUI();
+void addClass(struct CLASS **pclassLineHead, int classNum);
 //==========
 
 void InitializeState(){
@@ -58,7 +59,98 @@ int main(){
 //==========
 //打算放在main.c
 
-static void NewClass(char *accountName){
+
+void ViewClassList(){
+
+	int SelectedOption = 10, PressedKey, PressedKey_temp = 0;
+
+	int ClassCount = 0;
+	char pathname[NameNumMax + 30] = ".\\data\\", strTemp[NameNumMax];
+	FILE *fp;
+	struct CLASS *classLineHead = NULL;		//把链表表头初始化为空
+
+	strcat( pathname, accountName);			
+	strcat( pathname, "\\classlist.txt");
+	if( (fp = fopen(pathname, "r")) == NULL){			//打开指定路径文件
+		MessageBar("打开文件失败，请检查文件阅读权限          ");
+		Sleep(1000);
+		system("pause");
+		return;
+	}
+	while( !feof(fp)){								//检索classlist.txt中班级个数
+		fgets( strTemp, NameNumMax, fp);
+		ClassCount += 1;
+	}
+	fclose( fp);
+	ClassCount--;						//标题“班级列表”被记入班级数，因此减一
+
+	while(1){
+	
+		if( SelectedOption == ClassCount + 1 && PressedKey_temp == 13){			//指标指向返回时按回车
+			AccountUI();
+			break;
+		}
+
+		addClass(&classLineHead, ClassCount);
+		
+		system("cls");
+		ViewClassList_Display(SelectedOption, ClassCount, classLineHead);
+
+		fflush(stdin);
+		PressedKey_temp = _getch();
+		if( PressedKey_temp == 224 ){	//返回键盘值的函数对于方向键的键盘值会返回两次，所以先判断是否为方向键
+			PressedKey = _getch();
+			SelectedOption = getFlagWithPressedKey_ALL( SelectedOption, PressedKey, ClassCount + 1);
+		}
+	}
+}
+
+
+void addClass(struct CLASS **pclassLineHead, int classNum){		//尾接法
+	struct CLASS *newClass;
+	FILE *classListFile;
+	char className[NameNumMax], pathname[NameNumMax + 30] = ".\\data\\";
+	int i = 0;
+	
+	strcat( pathname, accountName);
+	strcat( pathname, "\\classlist.txt");
+	if( (classListFile = fopen( pathname, "r")) == NULL){
+		MessageBar("打开文件失败");
+	}
+
+	while( !feof(classListFile)){
+		newClass = (struct CLASS *)malloc(sizeof(struct CLASS));
+		if( newClass == NULL){						//分配地址，储存一个结构体
+			MessageBar("内存分配失败");
+			exit(1);
+		}
+
+		fgets( className, NameNumMax, classListFile);
+		for( i = 0; i < 20; i++){
+			if( className[i] == '\n'){						//删去'\n'
+				className[i] = '\0';
+			}
+		}
+		strcpy(newClass->name, className);				//把信息输入到结构体
+		newClass->ordinal = i;
+		i++;
+
+
+		if( *pclassLineHead == NULL){
+			*pclassLineHead = newClass;				//表头为空就把表头直接指向新结构体
+		}
+		else{
+			newClass->next = *pclassLineHead;		//表头不空则先新结构体指向表头
+			*pclassLineHead = newClass;				//然后把表头指向新结构体
+		}
+	}
+	fclose( classListFile);
+}
+
+
+
+
+void NewClass(){
 
 	int SelectedOption = 1, PressedKey, PressedKey_temp = 0;
 
@@ -66,13 +158,13 @@ static void NewClass(char *accountName){
 	
 		if( SelectedOption == 1 && PressedKey_temp == 13){			//指标指向输入班级名称时按回车
 			MessageBar("暂未开发。          ");
-			Sleep(1000);
+			Sleep(500);
 			AccountUI();
 			break;
 		}
 		if( SelectedOption == 2 && PressedKey_temp == 13){			//指标指向完成时按回车
 			MessageBar("暂未开发。          ");
-			Sleep(1000);
+			Sleep(500);
 			AccountUI();
 			break;
 		}
@@ -88,33 +180,31 @@ static void NewClass(char *accountName){
 		PressedKey_temp = _getch();
 		if( PressedKey_temp == 224 ){	//返回键盘值的函数对于方向键的键盘值会返回两次
 			PressedKey = _getch();
-			SelectedOption = getFlagWithPressedKey_III( SelectedOption, PressedKey);
+			SelectedOption = getFlagWithPressedKey_ALL( SelectedOption, PressedKey, 3);
 		}
 	}
 }
 
 
-static void AccountUI(){
+void AccountUI(){
 
 	int SelectedOption = 1, PressedKey, PressedKey_temp = 0;
 
 	while(1){
 	
 		if( SelectedOption == 1 && PressedKey_temp == 13){			//指标指向查看班级时按回车
-			MessageBar("暂未开发。          ");
-			Sleep(1000);
-			AccountUI( accountName);
-			break;
+			
+			ViewClassList();
 		}
 		if( SelectedOption == 2 && PressedKey_temp == 13){			//指标指向新建班级时按回车
 			MessageBar("暂未开发。          ");
-			Sleep(1000);
+			Sleep(500);
 			AccountUI( accountName);
 			break;
 		}
 		if( SelectedOption == 3 && PressedKey_temp == 13){			//指标指向注销时按回车
 			printf("注销成功！\n");
-			Sleep(1000);
+			Sleep(500);
 			MainMenu();
 			break;
 		}
@@ -127,13 +217,13 @@ static void AccountUI(){
 		PressedKey_temp = _getch();
 		if( PressedKey_temp == 224 ){	//返回键盘值的函数对于方向键的键盘值会返回两次
 			PressedKey = _getch();
-			SelectedOption = getFlagWithPressedKey_III( SelectedOption, PressedKey);
+			SelectedOption = getFlagWithPressedKey_ALL( SelectedOption, PressedKey, 3);
 		}
 	}
 }
 
 
-static int LoginUI(int dataInputState){								//登入界面
+int LoginUI(int dataInputState){								//登入界面
 
 	int SelectedOption = 1, PressedKey, PressedKey_temp = 0;
 
@@ -165,7 +255,7 @@ static int LoginUI(int dataInputState){								//登入界面
 			PressedKey_temp = _getch();
 			if( PressedKey_temp == 224 ){			//返回键盘值的函数对于方向键的键盘值会返回两次
 				PressedKey = _getch();
-				SelectedOption = getFlagWithPressedKey_III( SelectedOption, PressedKey);
+				SelectedOption = getFlagWithPressedKey_ALL( SelectedOption, PressedKey, 3);
 			}
 		}
 		else if( dataInputState == 0){					//输入状态
@@ -205,7 +295,7 @@ static int LoginUI(int dataInputState){								//登入界面
 }
 
 
-static int RegisterUI(int dataInputState){							//注册界面
+int RegisterUI(int dataInputState){							//注册界面
 
 	int SelectedOption = 1, PressedKey, PressedKey_temp = 0;
 
@@ -236,7 +326,7 @@ static int RegisterUI(int dataInputState){							//注册界面
 			PressedKey_temp = _getch();
 			if( PressedKey_temp == 224 ){			//返回键盘值的函数对于方向键的键盘值会返回两次
 				PressedKey = _getch();
-				SelectedOption = getFlagWithPressedKey_III( SelectedOption, PressedKey);
+				SelectedOption = getFlagWithPressedKey_ALL( SelectedOption, PressedKey, 3);
 			}
 		}
 		else if( dataInputState == 0){					//输入状态
@@ -276,7 +366,7 @@ static int RegisterUI(int dataInputState){							//注册界面
 }
 
 
-static void MainMenu(void){
+void MainMenu(void){
 
 	int SelectedOption = 1, PressedKey, PressedKey_temp = 0;
 
@@ -305,12 +395,12 @@ static void MainMenu(void){
 		PressedKey_temp = _getch();
 		if( PressedKey_temp == 224 ){		//返回键盘值的函数对于方向键的键盘值会返回两次
 			PressedKey = _getch();
-			SelectedOption = getFlagWithPressedKey_III( SelectedOption, PressedKey);
+			SelectedOption = getFlagWithPressedKey_ALL( SelectedOption, PressedKey, 3);
 		}
 	}
 }
 //==========
-static void LogToAcc(){
+void LogToAcc(){
 	FILE *fp;
 	char ReadFromFile[ NameNumMax + 2];
 	int IDCode = 2;			//1表示存在该用户，2表示不存在
@@ -336,12 +426,12 @@ static void LogToAcc(){
 	}
 	fclose( fp);
 
-//================================
+		//================================
 	if( IDCode == 1){
 		MessageBar("登入成功。          ");
-		Sleep(1000);
+		Sleep(400);
 		StrNum_Name = 0;
-		AccountUI( accountName);
+		AccountUI();
 	}
 	else if( IDCode == 2){
 		MessageBar("无此账号。          ");
@@ -351,7 +441,7 @@ static void LogToAcc(){
 	}
 }
 
-static void ReToLog(){
+void ReToLog(){
 	FILE *fp, *setFile;
 	int IDCode = 1, CompareResult;
 	char ReadFromFile[ NameNumMax + 2];
@@ -390,7 +480,7 @@ static void ReToLog(){
 
 	if( IDCode == 1){
 		int FileCreateState = 0;
-		char pathname[NameNumMax] = ".\\data\\";
+		char pathname[NameNumMax + 30] = ".\\data\\";
 
 		if( LineNum > 0){						//	原文有文字才打印换行符
 			fputs( "\n", fp);
@@ -415,21 +505,37 @@ static void ReToLog(){
 		
 		StrNum_NewName = 0;
 		MessageBar("注册成功。          ");
-		Sleep(1000);
+		Sleep(500);
 		LoginUI(-1);
 	}
 	else if( IDCode == 2){
 		fclose( fp);
 		StrNum_NewName = 0;
 		MessageBar("已存在此账号。          ");
-		Sleep(1000);
+		Sleep(600);
 		LoginUI(-1);
 	}
 	else if( IDCode == 3){
 		fclose( fp);
 		StrNum_NewName = 0;
 		MessageBar("不允许注册非法账号。          ");
-		Sleep(1000);
+		Sleep(700);
 		LoginUI(-1);
+	}
+}
+
+void PrintList_Class(int SelectedOption, int ClassCount, struct CLASS *classLineHead){
+	
+	int i;
+	printf("\n");
+	for( i = 0; i < ClassCount; i++){
+		if( SelectedOption == i + 1){
+			printf("%s\t\t\t\t|查看<", classLineHead->name);
+		}
+		else{
+			printf("%s\t\t\t\t查看", classLineHead->name);
+		}
+		printf("\n");
+		classLineHead = classLineHead->next;
 	}
 }
