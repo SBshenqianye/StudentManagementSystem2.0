@@ -14,18 +14,24 @@
 #define NameNumMax 16
 //==========
 
-struct CLASS{
+struct LIST{
 	int ordinal;
 	char name[NameNumMax];
-	struct CLASS *next;
+	struct LIST *next;
 };
 
 struct STUDENT{
 	int ordinal;
 	char name[NameNumMax];
-	long int ID;
-	int sex[NameNumMax];
+	char ID[NameNumMax];
+	char sex[NameNumMax];
 	char addres[NameNumMax];
-	long int PhoneNum;
-	struct *next;
+	char PhoneNum[NameNumMax];
+};
+
+struct HEADS{
+	int ordinal;
+	char name[NameNumMax];
+	struct STUDENT student;
+	struct HEADS *next;
 };

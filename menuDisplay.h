@@ -1,7 +1,8 @@
 
 
 extern void PrintList_Class(SelectedOption, ClassCount);
-
+extern void PrintList_Student(SelectedOption, ClassCount);
+extern void PrintList_Student_Bar(int SelectedOption, int StudentCount, struct HEADS *studnetLineHead);
 
 void gotoxy(short x, short y) {
     COORD coord = {x, y};
@@ -203,10 +204,10 @@ extern void AccountUI_Display(int SelectedOption, char *AccountName){
 
 }
 
-extern void NewClass_Display(int SelectedOption){
-	
+extern void NewClass_Display(int SelectedOption, int dataInputState, int StrNum){
+	int x = StrNum + 20;
 	int i;
-	printf("【新建班级】");
+	printf("【注册界面】");
 	printf("\n");
 
 	if( SelectedOption == 1){
@@ -240,9 +241,28 @@ extern void NewClass_Display(int SelectedOption){
 	}
 	printf("\n");
 
+	if( SelectedOption == 1){
+		gotoxy( 0, 1);
+		printf("> 输入新建班级名称：");
+		gotoxy( 20, 1);
+		printf("%s", inputTemp);
+		if( dataInputState == 0){
+			gotoxy( (short)x, 1);
+			printf("<");
+		}
+		printf("\n");
+	}
+	else if( SelectedOption != 1){
+		gotoxy( 0, 1);
+		printf("输入新建班级名称：");
+		gotoxy( 18, 1);
+		printf("%s", inputTemp);
+		printf("\n");
+	}
+
 }
 
-extern void ViewClassList_Display(int SelectedOption, int ClassCount, struct CLASS *classLineHead){
+extern void ViewClassList_Display(int SelectedOption, int ClassCount, struct LIST *classLineHead){
 
 
 
@@ -265,22 +285,17 @@ extern void ViewClassList_Display(int SelectedOption, int ClassCount, struct CLA
 	printf("\n");
 }
 
-extern void ViewClassA_Display(int SelectedOption, int StudentCount){
+extern void ViewClassA_Display(int SelectedOption, int StudentCount, struct LIST *studentLineHead, char className[NameNumMax]){
 
 	SelectedOption = SelectedOption + StudentCount;
 
 
-	printf("【班级：xxx】");
+	printf("【班级：%s】", className);
 	printf("\n");
 
 	printf("————————————");
-	printf("\n");
 
-	printf("学生列表");
-	printf("\n");
-
-//	PrintList_Student(SelectedOption);							//==================未编写函数
-	printf("\n");
+	PrintList_Student(SelectedOption, StudentCount, studentLineHead);
 
 	printf("————————————");
 	printf("\n");
@@ -302,19 +317,16 @@ extern void ViewClassA_Display(int SelectedOption, int StudentCount){
 	printf("\n");
 }
 
-extern void ViewClassB_Display(int SelectedOption, int StudentCount){
+extern void ViewClassB_Display(int SelectedOption, int StudentCount, struct HEADS *studentLineHead, char className[NameNumMax]){
 	
-	SelectedOption = SelectedOption + StudentCount;
 
 
-	printf("【班级：xxx】");
+	printf("【班级：%s】", className);
 	printf("\n");
 
 	printf("————————————");
-	printf("\n");
 
-	printf("学生列表");
-	printf("\n");
+	PrintList_Student_Bar(SelectedOption, StudentCount, studentLineHead);
 
 	printf("————————————");
 	printf("\n");
@@ -336,7 +348,7 @@ extern void ViewClassB_Display(int SelectedOption, int StudentCount){
 	printf("\n");
 }
 
-extern void ViewClassC_Display(int SelectedOption, int StudentCount){
+extern void ViewClassC_Display(int SelectedOption, int StudentCount, struct LIST *studentLineHead){
 	
 	int i;
 	SelectedOption = SelectedOption + StudentCount;
@@ -346,10 +358,8 @@ extern void ViewClassC_Display(int SelectedOption, int StudentCount){
 	printf("\n");
 
 	printf("————————————");
-	printf("\n");
 
-	printf("学生列表");
-	printf("\n");
+	PrintList_Student(SelectedOption, StudentCount, studentLineHead);
 
 	printf("————————————");
 	printf("\n");
