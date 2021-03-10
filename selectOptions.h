@@ -41,5 +41,8 @@ extern int getFlagWithPressedKey_ALL(int SelectedOption, int PressedKey, int Mem
 	else if( PressedKey == 80 ){
 		returned_SO = SelectedOption + 1;
 	}
+	if( PressedKey !=72 && PressedKey !=80){
+		returned_SO = SelectedOption;
+	}
 	return returned_SO;
 }

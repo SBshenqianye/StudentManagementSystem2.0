@@ -5,10 +5,13 @@
 char temp_accountName[NameNumMax] = "author";		//登入界面 账户ID显示
 char reg_accountName[NameNumMax];		//注册界面 账户ID显示
 char accountName[NameNumMax] = "author";			//登入成功后的ID显示
-char inputTemp[NameNumMax];					//输入框临时字符，建议用完就清除
-int StrNum_Name = 0;					//
-int StrNum_NewName = 0;					//
-int StrNum_InputTemp = 0;
+char inputTemp[NameNumMax];			//输入框临时字符，建议用完就清除（此处用于添加班级）
+char inputTempAdd[5][NameNumMax + 30] = {"", "", "", "", ""};		//输入框临时字符，建议用完就清除
+												//
+int StrNum_Name = 0;					//登入界面指针位置
+int StrNum_NewName = 0;					//注册账号指针位置
+int StrNum_InputTemp = 0;				//添加班级指针位置
+int StrNum_InputTempAdd[5] = {0, 0, 0, 0, 0};	//新同学输入框的指针位置
 
 
 //==========
@@ -32,8 +35,9 @@ void listClass(struct LIST **pclassLineHead, int classNum);
 void listStudent(struct LIST **pstudentLineHead, int studentNum, char className[NameNumMax]);
 void listStudentHead(struct HEADS **pstudentLineHead, int studentNum, char className[NameNumMax]);
 void inFlagKeyToOperation( int SelectedOption, int PressedKey_temp, struct LIST *classLineHead);
-void inFlagKeyToOperation2( int SelectedOption, int PressedKey_temp, struct HEADS *ergodicClass);
+void inFlagKeyToOperationOfDelete( int SelectedOption, int PressedKey_temp, struct HEADS *ergodicClass, int StudentCount);
 void getStudent(struct HEADS **pLeader, int studentNum, char className[NameNumMax]);
+void ViewClassB( char className[NameNumMax]);
 //==========
 
 void InitializeState(){
@@ -67,8 +71,207 @@ int main(){
 
 //==========
 //打算放在main.c
+void addStudent(){
+	;
+}
+
+void ViewClassD( char className[NameNumMax], int dataInputState){
+
+	int SelectedOption = 1, PressedKey, PressedKey_temp = 0;
+
+	int StudentCount = 0;
+	char pathname[NameNumMax + 30] = ".\\data\\", strTemp[NameNumMax];
+	FILE *fp;
+	struct HEADS *Leader = NULL;		//把链表表头初始化为空
+
+	strcat( pathname, accountName);
+	strcat( pathname, "\\");
+	strcat( pathname, className);
+	strcat( pathname, "\\students.txt");			//.\data\#username\#calssname\students.txt
+	if( (fp = fopen(pathname, "r")) == NULL){			//打开指定路径文件
+		MessageBar("打开文件失败，请检查文件阅读权限          ");
+		Sleep(1000);
+		system("pause");
+		return;
+	}
+	while( !feof(fp)){								//检索students.txt中学生个数
+		fgets( strTemp, NameNumMax, fp);
+		StudentCount += 1;
+	}
+	fclose( fp);
+	StudentCount--;						//标题“学生列表”被记入学生数，因此减一
+
+	while(1){
+
+		if( (SelectedOption == StudentCount + 1 || SelectedOption == StudentCount + 2 || SelectedOption == StudentCount + 3 || SelectedOption == StudentCount + 4 || SelectedOption == StudentCount + 5) && PressedKey_temp == 13){			//指标指向输入账号时按回车
+			if( dataInputState == -1){
+				dataInputState = 0;
+			}
+			else if( dataInputState == 0){
+				dataInputState = -1;
+			}
+		}
+
+		if( SelectedOption == StudentCount + 5 + 1 && PressedKey_temp == 13){			//指标指向添加同学时按回车
+//			addStudent();
+			ViewClassD( className);
+			break;
+		}
+		if( SelectedOption == StudentCount + 5 + 2 && PressedKey_temp == 13){			//指标指向返回时按回车
+			ViewClassList();
+			break;
+		}
+
+		getStudent(&Leader, StudentCount, className);	//students里储存了学生数量+1的数据，并且那条非学生在第一排
+
+		inFlagKeyToOperationOfDelete( SelectedOption, PressedKey, Leader, StudentCount);
+
+		system("cls");
+
+		ViewClassD_Display(SelectedOption, StudentCount, Leader, className, dataInputState, StrNum_InputTempAdd);
+
+		fflush(stdin);
+		if( dataInputState == -1){						//非输入状态
+			PressedKey_temp = _getch();
+			if( PressedKey_temp == 224 ){			//返回键盘值的函数对于方向键的键盘值会返回两次
+				PressedKey = _getch();
+				SelectedOption = getFlagWithPressedKey_ALL( SelectedOption, PressedKey, StudentCount + 7);
+			}
+		}
+		else if( dataInputState == 0){					//输入状态
+			PressedKey_temp = _getch();
+
+			if( PressedKey_temp == 13){						//如果是回车键，就略过此次循环
+				continue;
+			}
+			if( PressedKey_temp != 224 && PressedKey_temp != 8){//不是方向键退格键就输入字符
+				PressedKey = PressedKey_temp;
+				if(StrNum_InputTempAdd[SelectedOption - 1] < NameNumMax){
+					inputTempAdd[SelectedOption - 1][StrNum_InputTempAdd[SelectedOption - 1]] = PressedKey;
+					StrNum_InputTempAdd[SelectedOption - 1]++;
+					inputTempAdd[SelectedOption - 1][StrNum_InputTempAdd[SelectedOption - 1]] = '\0';
+				}
+				else{
+					MessageBar("最多只能输入16位字符。          ");
+					Sleep(1000);
+				}
+			}
+			else if( PressedKey_temp == 8){
+				if(StrNum_InputTempAdd[SelectedOption - 1] > 0){
+					inputTempAdd[SelectedOption - 1][StrNum_InputTempAdd[SelectedOption - 1] - 1] = '\0';
+					StrNum_InputTempAdd[SelectedOption - 1]--;
+				}
+				else{
+					MessageBar("请输入班级名称。          ");
+					Sleep(1000);
+				}
+			}
+			else{
+				PressedKey_temp = _getch();
+			}
+		}
+	}
+}
 
 
+void ViewClassC( char className[NameNumMax], int dataInputState){
+
+	int SelectedOption = 1, PressedKey, PressedKey_temp = 0;
+
+	int StudentCount = 0;
+	char pathname[NameNumMax + 30] = ".\\data\\", strTemp[NameNumMax];
+	FILE *fp;
+	struct HEADS *Leader = NULL;		//把链表表头初始化为空
+
+	strcat( pathname, accountName);
+	strcat( pathname, "\\");
+	strcat( pathname, className);
+	strcat( pathname, "\\students.txt");			//.\data\#username\#calssname\students.txt
+	if( (fp = fopen(pathname, "r")) == NULL){			//打开指定路径文件
+		MessageBar("打开文件失败，请检查文件阅读权限          ");
+		Sleep(1000);
+		system("pause");
+		return;
+	}
+	while( !feof(fp)){								//检索students.txt中学生个数
+		fgets( strTemp, NameNumMax, fp);
+		StudentCount += 1;
+	}
+	fclose( fp);
+	StudentCount--;						//标题“学生列表”被记入学生数，因此减一
+
+	while(1){
+
+		if( (SelectedOption == 1 || SelectedOption == 2 || SelectedOption == 3 || SelectedOption == 4 || SelectedOption == 5) && PressedKey_temp == 13){			//指标指向输入账号时按回车
+			if( dataInputState == -1){
+				dataInputState = 0;
+			}
+			else if( dataInputState == 0){
+				dataInputState = -1;
+			}
+		}
+
+		if( SelectedOption == 5 + 1 && PressedKey_temp == 13){			//指标指向编辑时按回车
+			ViewClassB( className);
+			break;
+		}
+		if( SelectedOption == 5 + 2 && PressedKey_temp == 13){			//指标指向返回时按回车
+			ViewClassList();
+			break;
+		}
+
+		getStudent(&Leader, StudentCount, className);	//students里储存了学生数量+1的数据，并且那条非学生在第一排
+//		inFlagKeyToOperationOfDelete( SelectedOption, PressedKey, Leader);
+		system("cls");
+		ViewClassC_Display(SelectedOption, StudentCount, Leader, className, dataInputState, StrNum_InputTempAdd);
+
+		fflush(stdin);
+
+	//	printf("%s\n%s\n%s\n%s\n%s\n",inputTempAdd[0],inputTempAdd[1],inputTempAdd[2],inputTempAdd[3],inputTempAdd[4]);
+		//测试添加同学字符串正常与否
+//		printf("inputTemp: %s\ninputTempAdd: %s", inputTemp, inputTempAdd[0]);
+
+		if( dataInputState == -1){						//非输入状态
+			PressedKey_temp = _getch();
+			if( PressedKey_temp == 224 ){			//返回键盘值的函数对于方向键的键盘值会返回两次
+				PressedKey = _getch();
+				SelectedOption = getFlagWithPressedKey_ALL( SelectedOption, PressedKey, 7);
+			}
+		}
+		else if( dataInputState == 0){					//输入状态
+			PressedKey_temp = _getch();
+
+			if( PressedKey_temp == 13){						//如果是回车键，就略过此次循环
+				continue;
+			}
+			if( PressedKey_temp != 224 && PressedKey_temp != 8){//不是方向键退格键就输入字符
+				PressedKey = PressedKey_temp;
+				if(StrNum_InputTempAdd[SelectedOption - 1] < NameNumMax){
+					inputTempAdd[SelectedOption - 1][StrNum_InputTempAdd[SelectedOption - 1]] = PressedKey;
+					StrNum_InputTempAdd[SelectedOption - 1]++;
+					inputTempAdd[SelectedOption - 1][StrNum_InputTempAdd[SelectedOption - 1]] = '\0';
+				}
+				else{
+					MessageBar("最多只能输入16位字符。          ");
+					Sleep(1000);
+				}
+			}
+			else if( PressedKey_temp == 8){
+				if(StrNum_InputTempAdd[SelectedOption - 1] > 0){
+					inputTempAdd[SelectedOption - 1][StrNum_InputTempAdd[SelectedOption - 1] - 1] = '\0';
+					StrNum_InputTempAdd[SelectedOption - 1]--;
+				}
+				else{
+					MessageBar("请输入班级名称。          ");
+					Sleep(1000);
+				}
+			}
+			else{
+				PressedKey_temp = _getch();
+			}
+		}
+	}
+}
 
 void ViewClassB( char className[NameNumMax]){
 
@@ -100,8 +303,7 @@ void ViewClassB( char className[NameNumMax]){
 	while(1){
 	
 		if( SelectedOption == StudentCount + 1 && PressedKey_temp == 13){			//指标指向添加同学时按回车
-			MessageBar("暂时未开发				");
-			system("pause");
+			ViewClassC( className, -1);
 			break;
 		}
 		if( SelectedOption == StudentCount + 2 && PressedKey_temp == 13){			//指标指向返回时按回车
@@ -122,7 +324,7 @@ void ViewClassB( char className[NameNumMax]){
 		system("pause");
 		*/
 
-		inFlagKeyToOperation2( SelectedOption, PressedKey, Leader);
+//		inFlagKeyToOperationinFlagKeyToOperation( SelectedOption, PressedKey, Leader);
 		
 		system("cls");
 		ViewClassB_Display(SelectedOption, StudentCount, Leader, className);
@@ -167,7 +369,8 @@ void ViewClassA( char className[NameNumMax]){
 	while(1){
 	
 		if( SelectedOption == 1 && PressedKey_temp == 13){			//指标指向编辑时按回车
-			ViewClassB( className);
+			ViewClassD( className, -1);
+//			ViewClassB( className);
 			break;
 		}
 		if( SelectedOption == 2 && PressedKey_temp == 13){			//指标指向返回时按回车
@@ -251,20 +454,25 @@ void inFlagKeyToOperation( int SelectedOption, int PressedKey_temp, struct LIST 
 	return;
 }
 
-void inFlagKeyToOperation2( int SelectedOption, int PressedKey_temp, struct HEADS *ergodicClass){
+void inFlagKeyToOperationOfDelete( int SelectedOption, int PressedKey_temp, struct HEADS *ergodicClass, int StudentCount){
 
 	char className[NameNumMax];
 	int i;
+	if( StudentCount == 0){
+		return;
+	}
 	for( i = 0; i < SelectedOption && ergodicClass->next != NULL; i++){
 		ergodicClass = ergodicClass->next;
 	}		//循环之后会依据SO得到一个序数，此时结构体的名字就等于ViewClassList_display里相应序数的名字
 	
 	strcpy( className, ergodicClass->name);
 	if( PressedKey_temp == 13){
-		ViewClassA( className);
+//		ViewClassA( className);
+		MessageBar("什么也没发生...			");
 	}
 	return;
 }
+
 
 void listClass(struct LIST **pclassLineHead, int classNum){		//尾接法
 	struct LIST *newClass;
@@ -441,6 +649,12 @@ void getStudent(struct HEADS **pLeader, int studentNum, char className[NameNumMa
 	strcat( pathname, accountName);
 	strcat( pathname, "\\");
 	strcat( pathname, className);			//.\data\#username\#classname
+
+
+	if(studentNum == 0){		//学生数目为零
+		return;
+	}
+
 
 	listStudentHead(pLeader, studentNum, className);
 												//把students.txt里的学生列出来，得到姓名、序号和指针
@@ -1066,6 +1280,23 @@ void PrintList_Student(int SelectedOption, int StudentCount, struct LIST *studne
 	}
 }
 
+void PrintList_Student_New(int SelectedOption, int StudentCount, struct HEADS *studnetLineHead){
+	
+	int i;
+	printf("\n");
+	printf("\t姓名\t学号\t性别\t地址\t电话号码\n");		//打印标题
+
+
+	for( i = 0; i < StudentCount ; i++){
+
+		printf("\t%s\t", studnetLineHead->student.name);
+		printf("%s\t%s\t", studnetLineHead->student.ID, studnetLineHead->student.sex);
+		printf("%s\t%s", studnetLineHead->student.addres, studnetLineHead->student.PhoneNum);
+		printf("\n");
+		studnetLineHead = studnetLineHead->next;
+	}
+}
+
 void PrintList_Student_Bar(int SelectedOption, int StudentCount, struct HEADS *studnetLineHead){
 	
 	int i;
@@ -1089,3 +1320,4 @@ void PrintList_Student_Bar(int SelectedOption, int StudentCount, struct HEADS *s
 		studnetLineHead = studnetLineHead->next;
 	}
 }
+
